@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { emailRegex } from "../utils/helpers.js";
 import { generateToken } from "../utils/jwt.js";
 import { ENV } from "../config/env.js";
-
+import cloudinary from "../lib/cloudinary.js";
 export const signup = catchAsyncError(async (req, res, next) => {
   const { fullName, email, password } = req.body;
 
@@ -119,4 +119,96 @@ export const signout = catchAsyncError(async (req, res, next) => {
       success: true,
       message: "Signed out successfully",
     });
+});
+
+export const getUser = catchAsyncError(async (req, res, next) => {
+  const user = req.user;
+
+  return res.status(200).json({
+    success: true,
+    message: "User fetched successfully",
+    results: {
+      user,
+    },
+  });
+});
+
+export const updateProfile = catchAsyncError(async (req, res, next) => {
+  const { fullName, email } = req.body;
+
+  if (fullName.trim().length === 0 || email.trim().length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide all fields",
+    });
+  }
+
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid email address",
+    });
+  }
+  const avatar = req?.files?.avatar;
+  let cloudinaryResponse = {};
+
+  if (avatar) {
+    try {
+      const oldAvatarPublicId = req.user?.avatar?.public_id;
+      if (oldAvatarPublicId && oldAvatarPublicId.length > 0) {
+        await cloudinary.uploader.destroy(oldAvatarPublicId);
+      }
+      cloudinaryResponse = await cloudinary.uploader.upload(
+        avatar.tempFilePath,
+        {
+          folder: "realtime-chat-app/avatars",
+          transformation: [
+            {
+              width: 300,
+              height: 300,
+              crop: "limit",
+            },
+            {
+              quality: "auto",
+            },
+            {
+              fetch_format: "auto",
+            },
+          ],
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Error uploading avatar",
+        error: error.message || "Failed to upload avatar",
+      });
+    }
+  }
+
+  let data = {
+    fullName,
+    email,
+  };
+
+  if (avatar && cloudinaryResponse?.public_id && cloudinaryResponse?.url) {
+    data.avatar = {
+      public_id: cloudinaryResponse?.public_id,
+      url: cloudinaryResponse?.url,
+    };
+  }
+
+  let user = await User.findByIdAndUpdate(req.user._id, data, {
+    new: true,
+    runValidators: true,
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Profile updated successfully",
+    results: {
+      user,
+    },
+  });
 });
