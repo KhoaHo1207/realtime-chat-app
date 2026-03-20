@@ -59,3 +59,16 @@ export const signup = catchAsyncError(async (req, res, next) => {
     message: "User created successfully",
   });
 });
+
+export const signin = catchAsyncError(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "PLease provide all fields",
+    });
+  }
+
+  
+});
