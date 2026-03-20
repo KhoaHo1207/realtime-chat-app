@@ -2,6 +2,8 @@ import { catchAsyncError } from "../middleware/catchAsyncError.middleware.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { emailRegex } from "../utils/helpers.js";
+import { generateToken } from "../utils/jwt.js";
+import { ENV } from "../config/env.js";
 
 export const signup = catchAsyncError(async (req, res, next) => {
   const { fullName, email, password } = req.body;
@@ -70,5 +72,51 @@ export const signin = catchAsyncError(async (req, res, next) => {
     });
   }
 
-  
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid password",
+    });
+  }
+
+  const token = await generateToken(user._id);
+
+  return res
+    .status(200)
+    .cookie("token", token, {
+      httpOnly: true,
+      secure: ENV.NODE_ENV === "production",
+      maxAge: ENV.COOKIE_EXPIRE * 24 * 60 * 60 * 1000,
+      sameSite: "strict",
+    })
+    .json({
+      success: true,
+      message: "Signed in successfully",
+    });
+});
+
+export const signout = catchAsyncError(async (req, res, next) => {
+  return res
+    .status(200)
+    .cookie("token", "", {
+      httpOnly: true,
+      secure: ENV.NODE_ENV === "production",
+      maxAge: 0,
+      sameSite: "strict",
+    })
+    .json({
+      success: true,
+      message: "Signed out successfully",
+    });
 });
