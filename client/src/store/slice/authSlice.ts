@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { User } from "../../types";
+import type { AxiosError } from "axios";
 import { axiosInstance } from "../../lib/axios";
+import type { User } from "../../types";
 
 interface AuthState {
   authUser: User | null;
@@ -20,10 +21,22 @@ const initialState: AuthState = {
   onlineUsers: [],
 };
 
-export const getUser = createAsyncThunk("auth/getUser", async () => {
-  const response = await axiosInstance.get("/user/me");
-  return response.data.results.user;
-});
+export const getUser = createAsyncThunk(
+  "user/me",
+  async (_: void, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/user/me");
+      return response.data.results.user;
+    } catch (error) {
+      console.log("Error fetching user", error);
+      const err = error as AxiosError<{ message: string }>;
+
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch user"
+      );
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -50,4 +63,5 @@ const authSlice = createSlice({
   },
 });
 
+export const { setOnlineUsers } = authSlice.actions;
 export default authSlice.reducer;
