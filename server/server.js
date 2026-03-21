@@ -5,12 +5,18 @@ import fileUpload from "express-fileupload";
 import cors from "cors";
 import connectDB from "./database/db.js";
 import initRoute from "./routes/index.route.js";
-const app = express();
+import http from "http";
+import { initSocket } from "./utils/socket.js";
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(
+const expressApp = express();
+const server = http.createServer(expressApp);
+
+initSocket(server);
+
+expressApp.use(express.json());
+expressApp.use(express.urlencoded({ extended: true }));
+expressApp.use(cookieParser());
+expressApp.use(
   cors({
     origin: [ENV.FRONTEND_URL, "http://localhost:3000"],
     credentials: true,
@@ -19,7 +25,7 @@ app.use(
   })
 );
 
-app.use(
+expressApp.use(
   fileUpload({
     useTempFiles: true,
     tempFileDir: "./temp/",
@@ -27,12 +33,12 @@ app.use(
 );
 
 connectDB();
-initRoute(app);
+initRoute(expressApp);
 
-app.get("/", (req, res) => {
-  return res.send(`Fucking bitch, ${ENV.PORT}!`);
+expressApp.get("/", (req, res) => {
+  return res.send(`Fucking bitch, ${server.address().port}!`);
 });
 
-app.listen(ENV.PORT, () => {
-  console.log(`Server is running on port: ${ENV.PORT}`);
+server.listen(ENV.PORT, () => {
+  console.log(`Server is running on port: ${server.address().port}`);
 });
