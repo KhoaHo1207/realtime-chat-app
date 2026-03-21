@@ -1,0 +1,53 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import type { User } from "../../types";
+import { axiosInstance } from "../../lib/axios";
+
+interface AuthState {
+  authUser: User | null;
+  isSigningUp: boolean;
+  isLoggingIn: boolean;
+  isUpdatingProfile: boolean;
+  isCheckingAuth: boolean;
+  onlineUsers: string[];
+}
+
+const initialState: AuthState = {
+  authUser: null,
+  isSigningUp: false,
+  isLoggingIn: false,
+  isUpdatingProfile: false,
+  isCheckingAuth: false,
+  onlineUsers: [],
+};
+
+export const getUser = createAsyncThunk("auth/getUser", async () => {
+  const response = await axiosInstance.get("/user/me");
+  return response.data.results.user;
+});
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState,
+
+  reducers: {
+    setOnlineUsers(state, action) {
+      state.onlineUsers = action.payload;
+    },
+  },
+
+  extraReducers: (builder) => {
+    builder
+      .addCase(getUser.fulfilled, (state, action) => {
+        state.authUser = action.payload;
+        state.isCheckingAuth = false;
+      })
+      .addCase(getUser.pending, (state) => {
+        state.isCheckingAuth = true;
+      })
+      .addCase(getUser.rejected, (state) => {
+        state.isCheckingAuth = false;
+      });
+  },
+});
+
+export default authSlice.reducer;
