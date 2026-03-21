@@ -4,8 +4,13 @@ import { connectSocket, disconnectSocket } from "./lib/socket";
 import { getUser, setOnlineUsers } from "./store/slice/authSlice";
 import type { AppDispatch, RootState } from "./store/store";
 import Loader from "./components/skeleton/Loader";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
+import Notfound from "./pages/Notfound";
+import Navbar from "./components/Navbar";
 function App() {
   const { authUser, isCheckingAuth } = useSelector(
     (state: RootState) => state.auth
@@ -39,9 +44,28 @@ function App() {
     );
   }
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-    </Routes>
+    <>
+      <Navbar />
+      <Routes>
+        <Route
+          path="/"
+          element={authUser ? <Home /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/login"
+          element={!authUser ? <Login /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/register"
+          element={!authUser ? <Register /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/profile"
+          element={authUser ? <Profile /> : <Navigate to="/login" />}
+        />
+        <Route path="*" element={<Notfound />} />
+      </Routes>
+    </>
   );
 }
 
