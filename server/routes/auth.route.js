@@ -9,5 +9,5 @@ router.post("/sign-in", signin);
 router.use(isAuthenticated);
 
 //private routes
-router.post("/sign-out", signout);
+router.get("/sign-out", signout);
 export default router;

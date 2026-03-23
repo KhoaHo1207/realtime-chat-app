@@ -5,6 +5,7 @@ import { emailRegex } from "../utils/helpers.js";
 import { generateToken } from "../utils/jwt.js";
 import { ENV } from "../config/env.js";
 import cloudinary from "../lib/cloudinary.js";
+
 export const signup = catchAsyncError(async (req, res, next) => {
   const { fullName, email, password } = req.body;
 
@@ -103,6 +104,9 @@ export const signin = catchAsyncError(async (req, res, next) => {
     .json({
       success: true,
       message: "Signed in successfully",
+      results: {
+        user,
+      },
     });
 });
 
