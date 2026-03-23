@@ -1,3 +1,4 @@
+import type { RegisterFormData } from "./../../types";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
 import { axiosInstance } from "../../lib/axios";
@@ -72,6 +73,25 @@ export const login = createAsyncThunk(
     }
   }
 );
+
+export const register = createAsyncThunk(
+  "user/sign-up",
+  async (formData: RegisterFormData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("auth/sign-up", formData);
+      toast.success(response.data.message || "Registered successfully");
+      return response.data.results.user;
+    } catch (error) {
+      console.log("Error registering", error);
+      const err = error as AxiosError<{ message: string }>;
+
+      toast.error(err.response?.data?.message || "Failed to register");
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to register"
+      );
+    }
+  }
+);
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -100,10 +120,10 @@ const authSlice = createSlice({
         state.authUser = null;
       })
       .addCase(logout.pending, (state) => {
-        state.authUser = state.authUser || null;
+        state.authUser = null;
       })
       .addCase(logout.rejected, (state) => {
-        state.authUser = state.authUser || null;
+        state.authUser = null;
       })
       .addCase(login.fulfilled, (state, action) => {
         state.isLoggingIn = false;
@@ -114,7 +134,15 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state) => {
         state.isLoggingIn = false;
-        state.authUser = state.authUser || null;
+      })
+      .addCase(register.fulfilled, (state) => {
+        state.isSigningUp = false;
+      })
+      .addCase(register.pending, (state) => {
+        state.isSigningUp = true;
+      })
+      .addCase(register.rejected, (state) => {
+        state.isSigningUp = false;
       });
   },
 });
