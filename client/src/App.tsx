@@ -20,7 +20,7 @@ function App() {
 
   useEffect(() => {
     dispatch(getUser());
-  }, [dispatch, getUser]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (authUser) {
@@ -34,7 +34,7 @@ function App() {
     return () => {
       disconnectSocket();
     };
-  }, [authUser]);
+  }, [authUser, dispatch]);
 
   if (isCheckingAuth && !authUser) {
     return (

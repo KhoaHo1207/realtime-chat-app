@@ -44,7 +44,7 @@ export const logout = createAsyncThunk(
   "user/sign-out",
   async (_: void, { rejectWithValue }) => {
     try {
-      await axiosInstance.get("/user/sign-out");
+      await axiosInstance.get("/auth/sign-out");
       disconnectSocket();
       return null;
     } catch (error) {
@@ -63,11 +63,11 @@ export const login = createAsyncThunk(
       const response = await axiosInstance.post("auth/sign-in", formData);
       connectSocket(response.data.results.user._id as string);
       toast.success(response.data.message || "Logged in successfully");
-      return null;
+      return response.data.results.user;
     } catch (error) {
       console.log("Error logging in", error);
       const err = error as AxiosError<{ message: string }>;
-
+      toast.error(err.response?.data?.message || "Failed to login");
       return rejectWithValue(err.response?.data?.message || "Failed to login");
     }
   }
@@ -105,16 +105,16 @@ const authSlice = createSlice({
       .addCase(logout.rejected, (state) => {
         state.authUser = state.authUser || null;
       })
-      .addCase(login.fulfilled, (state) => {
+      .addCase(login.fulfilled, (state, action) => {
         state.isLoggingIn = false;
-        state.authUser = state.authUser || null;
+        state.authUser = action.payload as User | null;
       })
       .addCase(login.pending, (state) => {
         state.isLoggingIn = true;
       })
-      .addCase(login.rejected, (state, action) => {
+      .addCase(login.rejected, (state) => {
         state.isLoggingIn = false;
-        state.authUser = action.payload as User | null;
+        state.authUser = state.authUser || null;
       });
   },
 });

@@ -20,6 +20,10 @@ export default function Login() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch(login(formData));
+    setFormData({
+      email: "",
+      password: "",
+    });
   };
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
@@ -62,6 +66,8 @@ export default function Login() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
+                  required
+                  disabled={isLoggingIn}
                 />
               </div>
             </div>
@@ -87,6 +93,8 @@ export default function Login() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
+                  required
+                  disabled={isLoggingIn}
                 />
                 <button
                   type="button"

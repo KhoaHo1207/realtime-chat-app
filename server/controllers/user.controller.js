@@ -69,7 +69,7 @@ export const signin = catchAsyncError(async (req, res, next) => {
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: "PLease provide all fields",
+      message: "Please provide all fields",
     });
   }
 
