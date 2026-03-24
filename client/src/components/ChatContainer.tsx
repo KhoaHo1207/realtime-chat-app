@@ -1,20 +1,18 @@
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../store/store";
 import { useEffect, useRef } from "react";
-import { getMessages } from "../store/slice/chatSlice";
-import MessageSkeleton from "./skeleton/MessageSkeleton";
+import { useDispatch, useSelector } from "react-redux";
 import { getSocket } from "../lib/socket";
+import { getMessages } from "../store/slice/chatSlice";
+import type { AppDispatch, RootState } from "../store/store";
+import { formatMessageTime } from "../utils/formatter";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
-import { formatMessageTime } from "../utils/formatter";
+import MessageSkeleton from "./skeleton/MessageSkeleton";
 
 export default function ChatContainer() {
-  const { messages, selectedUser } = useSelector(
+  const { messages, selectedUser, isMessagesLoading } = useSelector(
     (state: RootState) => state.chat
   );
   const { authUser } = useSelector((state: RootState) => state.auth);
-
-  const isMessagesLoading = true;
 
   const messageEndRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -46,9 +44,11 @@ export default function ChatContainer() {
   }
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-white">
+      <ChatHeader />
       {/* MESSAGES */}
+
       <div className="flex-1 overflow-y-auto space-y-6">
-        {messages.length > 0 &&
+        {messages.length > 0 ? (
           messages.map((message, index) => {
             const isSender = message.senderId === authUser?._id;
             return (
@@ -112,8 +112,17 @@ export default function ChatContainer() {
                 </div>
               </div>
             );
-          })}
+          })
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-gray-500">
+            <div className="text-lg font-medium mt-10">
+              Let&apos;s start a conversation
+            </div>
+          </div>
+        )}
       </div>
+
+      <MessageInput />
     </div>
   );
 }
