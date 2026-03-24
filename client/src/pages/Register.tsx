@@ -15,6 +15,7 @@ import {
 import { register } from "../store/slice/authSlice";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -51,195 +52,204 @@ export default function Register() {
     navigate("/login");
   };
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
-      {/* LEFT SIDE FORM */}
-      <div className="flex flex-col justify-center items-center px-6 py-12">
-        <div className="w-full max-w-md">
-          {/* LOGO & HEADING */}
-          <div className="flex flex-col items-center text-center mb-10">
-            <div className="bg-blue-100 p-3 rounded-lg">
-              <MessageSquare className="text-blue-600 w-6 h-6" />
-            </div>
-
-            <h1 className="text-2xl font-bold mt-4">Welcome!</h1>
-            <p className="text-gray-500 text-sm mt-2">
-              Create an account to continue your conversation and catch up with
-              your messages.
-            </p>
-          </div>
-
-          {/* REGISTER FORM */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="">
-              <label
-                htmlFor=""
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Full Name
-              </label>
-              <div className="relative">
-                <span
-                  className="absolute left-3 top-1/2 -translate-y-1/2
-                 text-gray-400"
-                >
-                  <User className="size-5" />
-                </span>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="John Doe"
-                  value={formData.fullName}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFormData({ ...formData, fullName: e.target.value })
-                  }
-                  required
-                  disabled={isSigningUp}
-                />
+    <>
+      <Helmet>
+        <title>Register | Talkie</title>
+        <meta
+          name="description"
+          content="Create a new Talkie account to start real-time conversations."
+        />
+      </Helmet>
+      <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
+        {/* LEFT SIDE FORM */}
+        <div className="flex flex-col justify-center items-center px-6 py-12">
+          <div className="w-full max-w-md">
+            {/* LOGO & HEADING */}
+            <div className="flex flex-col items-center text-center mb-10">
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <MessageSquare className="text-blue-600 w-6 h-6" />
               </div>
+
+              <h1 className="text-2xl font-bold mt-4">Welcome!</h1>
+              <p className="text-gray-500 text-sm mt-2">
+                Create an account to continue your conversation and catch up
+                with your messages.
+              </p>
             </div>
-            <div className="">
-              <label
-                htmlFor=""
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email
-              </label>
-              <div className="relative">
-                <span
-                  className="absolute left-3 top-1/2 -translate-y-1/2
+
+            {/* REGISTER FORM */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="">
+                <label
+                  htmlFor=""
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Full Name
+                </label>
+                <div className="relative">
+                  <span
+                    className="absolute left-3 top-1/2 -translate-y-1/2
                  text-gray-400"
-                >
-                  <Mail className="size-5" />
-                </span>
-                <input
-                  type="email"
-                  className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="johndoe@example.com"
-                  value={formData.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  required
-                  disabled={isSigningUp}
-                />
+                  >
+                    <User className="size-5" />
+                  </span>
+                  <input
+                    type="text"
+                    className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="John Doe"
+                    value={formData.fullName}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setFormData({ ...formData, fullName: e.target.value })
+                    }
+                    required
+                    disabled={isSigningUp}
+                  />
+                </div>
               </div>
-            </div>
-
-            <div className="">
-              <label
-                htmlFor=""
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <span
-                  className="absolute left-3 top-1/2 -translate-y-1/2
+              <div className="">
+                <label
+                  htmlFor=""
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email
+                </label>
+                <div className="relative">
+                  <span
+                    className="absolute left-3 top-1/2 -translate-y-1/2
                  text-gray-400"
-                >
-                  <Lock className="size-5" />
-                </span>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="********"
-                  value={formData.password}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  required
-                  disabled={isSigningUp}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="size-5 cursor-pointer" />
-                  ) : (
-                    <Eye className="size-5 cursor-pointer" />
-                  )}
-                </button>
+                  >
+                    <Mail className="size-5" />
+                  </span>
+                  <input
+                    type="email"
+                    className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="johndoe@example.com"
+                    value={formData.email}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    required
+                    disabled={isSigningUp}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="">
-              <label
-                htmlFor=""
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Confirm Password
-              </label>
-              <div className="relative">
-                <span
-                  className="absolute left-3 top-1/2 -translate-y-1/2
+              <div className="">
+                <label
+                  htmlFor=""
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <span
+                    className="absolute left-3 top-1/2 -translate-y-1/2
                  text-gray-400"
-                >
-                  <Lock className="size-5" />
-                </span>
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="********"
-                  value={formData.confirmPassword}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFormData({
-                      ...formData,
-                      confirmPassword: e.target.value,
-                    })
-                  }
-                  required
-                  disabled={isSigningUp}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="size-5 cursor-pointer" />
-                  ) : (
-                    <Eye className="size-5 cursor-pointer" />
-                  )}
-                </button>
+                  >
+                    <Lock className="size-5" />
+                  </span>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="********"
+                    value={formData.password}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    required
+                    disabled={isSigningUp}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-5 cursor-pointer" />
+                    ) : (
+                      <Eye className="size-5 cursor-pointer" />
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* SUBMIT BUTTON */}
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isSigningUp}
-            >
-              {isSigningUp ? (
-                <Loader2 className="size-5 animate-spin" />
-              ) : (
-                "Create Account"
-              )}
-            </button>
-          </form>
+              <div className="">
+                <label
+                  htmlFor=""
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <span
+                    className="absolute left-3 top-1/2 -translate-y-1/2
+                 text-gray-400"
+                  >
+                    <Lock className="size-5" />
+                  </span>
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="********"
+                    value={formData.confirmPassword}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setFormData({
+                        ...formData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
+                    required
+                    disabled={isSigningUp}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="size-5 cursor-pointer" />
+                    ) : (
+                      <Eye className="size-5 cursor-pointer" />
+                    )}
+                  </button>
+                </div>
+              </div>
 
-          {/* FOOTER */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">
-              Already have an account? {""}
-              <Link
-                to={"/login"}
-                className="text-blue-600 hover:underline font-medium"
+              {/* SUBMIT BUTTON */}
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSigningUp}
               >
-                Login Now
-              </Link>
-            </p>
+                {isSigningUp ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  "Create Account"
+                )}
+              </button>
+            </form>
+
+            {/* FOOTER */}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-500">
+                Already have an account? {""}
+                <Link
+                  to={"/login"}
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  Login Now
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* RIGHT SIDE PATTERN */}
-      <AuthImagePattern
-        title="Create an account!"
-        subTitle="Create an account to continue your conversation and catch up with your messages."
-      />
-    </div>
+        {/* RIGHT SIDE PATTERN */}
+        <AuthImagePattern
+          title="Create an account!"
+          subTitle="Create an account to continue your conversation and catch up with your messages."
+        />
+      </div>
+    </>
   );
 }
