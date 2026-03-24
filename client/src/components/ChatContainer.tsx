@@ -9,10 +9,13 @@ import MessageInput from "./MessageInput";
 import { formatMessageTime } from "../utils/formatter";
 
 export default function ChatContainer() {
-  const { isMessagesLoading, messages, selectedUser } = useSelector(
+  const { messages, selectedUser } = useSelector(
     (state: RootState) => state.chat
   );
   const { authUser } = useSelector((state: RootState) => state.auth);
+
+  const isMessagesLoading = true;
+
   const messageEndRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch<AppDispatch>();
 
