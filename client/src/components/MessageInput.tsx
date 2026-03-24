@@ -5,8 +5,9 @@ import { toast } from "react-toastify";
 import { getSocket } from "../lib/socket";
 import type { AppDispatch, RootState } from "../store/store";
 import type { Message } from "../types";
+import { sendMessage } from "../store/slice/chatSlice";
 
-export default function MessageInput() {
+export default function MessageInput({ receiverId }: { receiverId: string }) {
   const [text, setText] = useState<string>("");
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [media, setMedia] = useState<File | null>(null);
@@ -14,7 +15,9 @@ export default function MessageInput() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const dispatch = useDispatch<AppDispatch>();
-  const { selectedUser } = useSelector((state: RootState) => state.chat);
+  const { selectedUser, isSendingMessage } = useSelector(
+    (state: RootState) => state.chat
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,10 +63,16 @@ export default function MessageInput() {
     }
 
     const data = new FormData();
-    data.append("text", text.trim());
-    data.append("media", media as File);
+    const trimmedText = text.trim();
 
-    // dispatch(sendMesage(data))
+    if (trimmedText) data.append("text", trimmedText);
+    if (media) data.append("media", media);
+    dispatch(
+      sendMessage({
+        receiverId,
+        data: data,
+      })
+    );
 
     setText("");
     setMedia(null);
@@ -157,7 +166,7 @@ export default function MessageInput() {
         <button
           type="submit"
           className="size-10 flex items-center justify-center rounded-full bg-blue-600 hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
-          disabled={!text.trim() && !media}
+          disabled={(!text.trim() && !media) || isSendingMessage}
         >
           <SendHorizonal size={20} className="text-white" />
         </button>

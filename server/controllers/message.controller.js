@@ -2,7 +2,7 @@ import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import { catchAsyncError } from "../middleware/catchAsyncError.middleware.js";
 import cloudinary from "../lib/cloudinary.js";
-import { getReceiverSocketId } from "../utils/socket.js";
+import { getReceiverSocketId, io } from "../utils/socket.js";
 
 export const getAllUsers = catchAsyncError(async (req, res, next) => {
   const user = req.user;
@@ -39,22 +39,19 @@ export const getMessages = catchAsyncError(async (req, res, next) => {
       { senderId: myId, receiverId: receiverId },
       { senderId: receiverId, receiverId: myId },
     ],
-  });
+  }).sort({ createdAt: 1 });
 
-  return res
-    .status(200)
-    .json({
-      success: true,
-      message: "Messages fetched successfully",
-      results: {
-        messages,
-      },
-    })
-    .sort({ createdAt: 1 });
+  return res.status(200).json({
+    success: true,
+    message: "Messages fetched successfully",
+    results: {
+      messages,
+    },
+  });
 });
 
 export const sendMessage = catchAsyncError(async (req, res, next) => {
-  const { text } = req.body;
+  const { text } = req.body ?? {};
   const media = req?.files?.media;
   const { id: receiverId } = req.params;
   const myId = req.user._id;
@@ -122,19 +119,14 @@ export const sendMessage = catchAsyncError(async (req, res, next) => {
 
   const receiverSocketId = getReceiverSocketId(receiverId);
   if (receiverSocketId) {
-    io.to(receiverSocketId).emit("newMessage", {
-      message: message._id,
-      sender: {
-        _id: myId,
-        fullName: receiver.fullName,
-        email: receiver.email,
-        avatar: receiver.avatar,
-      },
-    });
+    io.to(receiverSocketId).emit("newMessage", message);
   }
 
   return res.status(201).json({
     success: true,
     message: "Message sent successfully",
+    results: {
+      message,
+    },
   });
 });

@@ -38,7 +38,7 @@ export default function ChatContainer() {
       <div className="flex-1 flex flex-col overflow-auto">
         <ChatHeader />
         <MessageSkeleton />
-        <MessageInput />
+        <MessageInput receiverId={selectedUser?._id || ""} />
       </div>
     );
   }
@@ -47,7 +47,7 @@ export default function ChatContainer() {
       <ChatHeader />
       {/* MESSAGES */}
 
-      <div className="flex-1 overflow-y-auto space-y-6">
+      <div className="flex-1 overflow-y-auto space-y-6 pt-6 px-3">
         {messages.length > 0 ? (
           messages.map((message, index) => {
             const isSender = message.senderId === authUser?._id;
@@ -61,17 +61,21 @@ export default function ChatContainer() {
               >
                 {/* AVATAR */}
                 <div
-                  className={`size-10 rounded-full overflow-hidden border shrink-0 ${
+                  className={`size-10 rounded-full overflow-hidden border border-gray-400 shrink-0 ${
                     isSender ? "order-2 ml-3" : "order-1 mr-3"
                   }`}
                 >
                   <img
                     src={
                       isSender
-                        ? authUser?.avatar?.url
+                        ? authUser?.avatar?.url || "/avatar-holder.avif"
                         : selectedUser?.avatar?.url || "/avatar-holder.avif"
                     }
-                    alt={isSender ? authUser?.fullName : selectedUser?.fullName}
+                    alt={
+                      isSender
+                        ? authUser?.fullName || "User"
+                        : selectedUser?.fullName || "User"
+                    }
                     className="size-full object-cover"
                   />
                 </div>
@@ -122,7 +126,7 @@ export default function ChatContainer() {
         )}
       </div>
 
-      <MessageInput />
+      <MessageInput receiverId={selectedUser?._id || ""} />
     </div>
   );
 }

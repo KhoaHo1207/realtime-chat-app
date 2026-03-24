@@ -10,6 +10,7 @@ interface ChatState {
   messages: Message[];
   isUsersLoading: boolean;
   isMessagesLoading: boolean;
+  isSendingMessage: boolean;
 }
 
 const initialState: ChatState = {
@@ -18,6 +19,7 @@ const initialState: ChatState = {
   messages: [],
   isUsersLoading: false,
   isMessagesLoading: false,
+  isSendingMessage: false,
 };
 
 export const getUsers = createAsyncThunk(
@@ -37,7 +39,7 @@ export const getUsers = createAsyncThunk(
 );
 
 export const getMessages = createAsyncThunk(
-  "message/getMessages",
+  "chat/getMessages",
   async (receiverId: string, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/message/${receiverId}`);
@@ -49,6 +51,35 @@ export const getMessages = createAsyncThunk(
 
       return rejectWithValue(
         err.response?.data?.message || "Failed to fetch messages"
+      );
+    }
+  }
+);
+
+export const sendMessage = createAsyncThunk(
+  "chat/sendMessage",
+  async (
+    { receiverId, data }: { receiverId: string; data: FormData },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axiosInstance.post(
+        `/message/send/${receiverId}`,
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      toast.success(response.data.message || "Message sent successfully");
+      return response.data.results.message;
+    } catch (error) {
+      console.log("Error sending message", error);
+      const err = error as AxiosError<{ message: string }>;
+      toast.error(err.response?.data?.message || "Failed to send message");
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to send message"
       );
     }
   }
@@ -87,6 +118,16 @@ const chatSlice = createSlice({
       })
       .addCase(getMessages.rejected, (state) => {
         state.isMessagesLoading = false;
+      })
+      .addCase(sendMessage.pending, (state) => {
+        state.isSendingMessage = true;
+      })
+      .addCase(sendMessage.fulfilled, (state, action) => {
+        state.isSendingMessage = false;
+        state.messages.push(action.payload as Message);
+      })
+      .addCase(sendMessage.rejected, (state) => {
+        state.isSendingMessage = false;
       }),
 });
 export const { setSelectedUser, pushNewMessage } = chatSlice.actions;
