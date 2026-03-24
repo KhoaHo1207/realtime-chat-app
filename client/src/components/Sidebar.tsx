@@ -3,14 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store/store";
 import { getUsers, setSelectedUser } from "../store/slice/chatSlice";
 import { Users } from "lucide-react";
-import Loader from "./skeleton/Loader";
+import SidebarSkeleton from "./skeleton/SidebarSkeleton";
 
 export default function Sidebar() {
   const [showOnlineOnly, setShowOnlineOnly] = useState<boolean>(false);
   const { users, selectedUser, isUsersLoading } = useSelector(
     (state: RootState) => state.chat
   );
-
   const { onlineUsers } = useSelector((state: RootState) => state.auth);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -23,7 +22,7 @@ export default function Sidebar() {
     : users;
 
   if (isUsersLoading) {
-    return <Loader />;
+    return <SidebarSkeleton />;
   }
 
   return (
