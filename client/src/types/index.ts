@@ -2,7 +2,7 @@ export type User = {
   _id: string;
   fullName: string;
   email: string;
-  avatar?: string;
+  avatar?: Avatar;
 };
 
 export type LoginFormData = {
@@ -15,4 +15,9 @@ export type RegisterFormData = {
   password: string;
   fullName: string;
   confirmPassword?: string;
+};
+
+export type Avatar = {
+  public_id: string;
+  url: string;
 };
