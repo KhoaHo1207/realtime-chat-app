@@ -17,10 +17,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-full">
           {/* LEFT LOGO */}
           <div className="flex items-center gap-8">
-            <Link
-              to={"/"}
-              className="flex items-center gap-2.5 hover:opacity-0 transition"
-            >
+            <Link to={"/"} className="flex items-center gap-2.5 transition hover:scale-105">
               <div className="size-9 rounded-lg bg-blue-100 flex items-center justify-center">
                 <MessageSquare className="size-5 text-blue-600" />
               </div>

@@ -31,3 +31,9 @@ export type Message = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type UpdateProfileFormData = {
+  fullName: string;
+  email: string;
+  avatar?: Avatar | string;
+};

@@ -1,10 +1,10 @@
-import type { RegisterFormData } from "./../../types";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
-import { axiosInstance } from "../../lib/axios";
-import type { LoginFormData, User } from "../../types";
-import { connectSocket, disconnectSocket } from "../../lib/socket";
 import { toast } from "react-toastify";
+import { axiosInstance } from "../../lib/axios";
+import { connectSocket, disconnectSocket } from "../../lib/socket";
+import type { LoginFormData, User } from "../../types";
+import type { RegisterFormData } from "./../../types";
 
 interface AuthState {
   authUser: User | null;
@@ -20,7 +20,7 @@ const initialState: AuthState = {
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
-  isCheckingAuth: false,
+  isCheckingAuth: true,
   onlineUsers: [],
 };
 
@@ -92,6 +92,33 @@ export const register = createAsyncThunk(
     }
   }
 );
+
+export const updateProfile = createAsyncThunk(
+  "user/update-profile",
+  async (formData: FormData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.put(
+        "/user/update-profile",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      toast.success(response.data.message || "Profile updated successfully");
+      return response.data.results.user;
+    } catch (error) {
+      console.log("Error updating profile", error);
+      const err = error as AxiosError<{ message: string }>;
+      toast.error(err.response?.data?.message || "Failed to update profile");
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to update profile"
+      );
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -110,7 +137,7 @@ const authSlice = createSlice({
       })
       .addCase(getUser.pending, (state) => {
         state.authUser = null;
-        state.isCheckingAuth = false;
+        state.isCheckingAuth = true;
       })
       .addCase(getUser.rejected, (state) => {
         state.authUser = null;
@@ -143,6 +170,19 @@ const authSlice = createSlice({
       })
       .addCase(register.rejected, (state) => {
         state.isSigningUp = false;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.isUpdatingProfile = false;
+        state.authUser = {
+          ...state.authUser,
+          ...action.payload,
+        };
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.isUpdatingProfile = true;
+      })
+      .addCase(updateProfile.rejected, (state) => {
+        state.isUpdatingProfile = false;
       });
   },
 });

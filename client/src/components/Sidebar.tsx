@@ -1,8 +1,8 @@
+import { Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../store/store";
 import { getUsers, setSelectedUser } from "../store/slice/chatSlice";
-import { Users } from "lucide-react";
+import type { AppDispatch, RootState } from "../store/store";
 import SidebarSkeleton from "./skeleton/SidebarSkeleton";
 
 export default function Sidebar() {
@@ -11,7 +11,6 @@ export default function Sidebar() {
     (state: RootState) => state.chat
   );
   const { onlineUsers } = useSelector((state: RootState) => state.auth);
-
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(getUsers());
@@ -61,13 +60,13 @@ export default function Sidebar() {
         </div>
 
         {/* USER LIST */}
-        <div className="overflow-y-auto w-full py-3">
+        <div className="overflow-y-auto w-full py-3 space-y-2 px-2">
           {filteredUsers.length > 0 &&
             filteredUsers.map((user) => (
               <button
                 key={user._id}
                 onClick={() => dispatch(setSelectedUser(user))}
-                className={`w-full p-3 flex items-center gap-3 transition-colors rounded-md ${
+                className={`w-full p-3 flex items-center gap-3 transition-colors rounded-md cursor-pointer ${
                   selectedUser?._id === user._id
                     ? "bg-gray-200 ring-gray-200"
                     : "hover:bg-gray-200"
